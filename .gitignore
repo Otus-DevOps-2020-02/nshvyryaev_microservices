@@ -1,0 +1,16 @@
+# IDE
+.idea
+
+# Packer
+variables.json
+
+# Terraform
+*.tfstate
+*.tfstate.*.backup
+*.tfstate.backup
+*.tfvars
+.terraform/
+
+# Ansible
+*.retry
+service-account-file.json

@@ -1,0 +1,12 @@
+$ docker images
+REPOSITORY                                       TAG                 IMAGE ID            CREATED             SIZE
+nshvyryaev/ubuntu-tmp-file                       latest              4e903f91ddd9        13 seconds ago      125MB
+// Образов много, если нужен вывод дальше - прошу сказать.
+
+---------
+
+Сравнение вывода команд docker inspect container_id и docker inspect image_id:
+У контейнера есть поля State, NetworkSettings, HostConfig, которых нет у image.
+Выходит, image содержит информацию о состоянии файловой системы.
+Контейнер берет эту информацию за основу и дополняет ее описанием состояния контейнера,
+сетей, связей с хостом.
