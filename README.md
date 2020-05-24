@@ -23,11 +23,11 @@ docker push nikitagsh/otus-reddit:1.0
 - Запустить локально из запушенного образа - `docker run --name reddit -d -p 9292:9292 --rm nikitagsh/otus-reddit:1.0`
 
 ### (*) Создание окружения с помощью Packer, Terraform, Ansible
-- Добавлена папка [dockermonolith/infra](./dockermonolith/infra)
+- Добавлена папка [dockermonolith/infra](docker-monolith/infra)
 - С помощью Packer собран образ `docker-host`, содержащий установленный Docker
 - С помощью Terraform можно запустить конфигурируемое переменной количество инстансов и разрешить трафик на порт 9292
 - Ansible устанавливает необходимые для своей работы с докером плагины и запускает контейнер с приложение на каждом инстансе, полученном с помощью динамического inventory.
-- Инструкции по запуску инфраструктуры можно найти в [infra README](./dockermonolith/infra/README.md)
+- Инструкции по запуску инфраструктуры можно найти в [infra README](docker-monolith/infra/README.md)
 
 ### Примечания
 - Для доступа к приложению нужно открыть порт `9292` (использовать скрипт [gcloud_add_firewall_rule_puma.sh](./docker-monolith/gcloud_add_firewall_rule_puma.sh)):
