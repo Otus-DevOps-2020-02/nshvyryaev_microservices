@@ -1,0 +1,6 @@
+project          = "id"
+public_key_path  = "~/.ssh/appuser.pub"
+private_key_path = "~/.ssh/appuser"
+disk_image       = "docker-host"
+instance_count   = 1
+ssh_ip_ranges    = ["2.2.2.2"]
