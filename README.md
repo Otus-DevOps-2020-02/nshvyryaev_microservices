@@ -78,3 +78,33 @@ gcloud compute firewall-rules create reddit-app \
 - Выполнить `docker-machine ls` для получени IP адреса docker-host
 - Зайти на `http://<docker-host-ip>:9292/`
 - Написать пост
+
+# ДЗ №14 - Docker 4: сети, docker-compose
+- Выполнены эксперименты с запуском docker-контейнеров в сети с драйверами none, host, bridge
+
+- Запуск больше одного контейнера nginx с `--network host` невозможен так как порт уже занят, возникает ошибка,
+в случае запуска nginx с `--network none` все хорошо - каждый раз создаётся отдельный network namespace.
+
+- Сервисы запущены через `docker run` с использование двух сетей `front_net` и `back_net`, так чтобы ui не имел доступа к mongodb.
+При запуске докер может добавить только одну сеть, подсоединять новую надо отдельной командой `docker network connect front_net post`.
+
+- Проведены исследования bridge-интерфейсов и сетей на docker-machine.
+
+- Создан файл [docker-compose.yml](src/docker-compose.yml)
+  - Добавлен alias `comment_db` для базы, иначе сервис комментариев ее не видит. Можно так же подправить переменную окружения в docker-compose.yml для сервиса comment.
+- Создан файл с переменными [.env](src/.env), [docker-compose.yml](src/docker-compose.yml) параметризован
+- Созданные сущности имеют префикс `src` - название директории, в которой находится docker-compose.yml. Можно переопределить с помощью:
+  - [COMPOSE_PROJECT_NAME](https://docs.docker.com/compose/reference/envvars/#compose_project_name)
+  - Из командной строки с ключом [-p, --project-name NAME](https://docs.docker.com/compose/reference/overview/)
+  - Примечание: ключ командной строки перебивает значение переменной.
+- (★) Создан `docker-compose.override.yml` для запуска puma в режиме debug с двумя воркерами, а также с возможностью динамического редактирования кода
+  - `docker-compose.override.yml` ломает запуск приложения на docker-host, так как на нем нет копии нужных файлов. Локально все работает.
+
+### Как запустить
+- docker-compose up -d
+- docker-compose down
+
+### Как проверить
+- Выполнить `docker-machine ls` для получени IP адреса docker-host
+- Зайти на `http://<docker-host-ip>:9292/`
+- Написать пост
