@@ -61,8 +61,8 @@ gcloud compute firewall-rules create reddit-app \
   - `docker run -d --network=reddit -e POST_SERVICE_HOST=post_alt -e COMMENT_SERVICE_HOST=comment_alt -p 9292:9292 nikitagsh/ui:1.0`
 - Изменен образ UI, сборка началась с 1 шага, так как изменился базовый образ
 - (★) Образ UI собран из ruby:alpine, понадобилось добавить build-base для сборки приложения.
-  - Образ на основе `FROM ruby:2.2-alpine` с удалением `build-base` вышел 162 Mb, но теперь установка пакетов не кэшируется
-  - Образ собранный из `FROM alpine:3.11.6` без удаления `build-base` весит 253 Mb ([Dockerfile.1](src/ui/Dockerfile.1))
+  - Образ на основе `FROM ruby:2.2-alpine` с удалением `build-base` вышел 162 Mb, но теперь установка пакетов не кэшируется ([Dockerfile.1](src/ui/Dockerfile.1))
+  - Образ собранный из `FROM alpine:3.11.6` без удаления `build-base` весит 253 Mb ([Dockerfile](src/ui/Dockerfile))
 - Создан Volume `docker volume create reddit_db`
 - Созданный volume подключен к базе с помощью флага `-v reddit_db:/data/db`. Теперь посты переживают перезапуск контейнеров.
 

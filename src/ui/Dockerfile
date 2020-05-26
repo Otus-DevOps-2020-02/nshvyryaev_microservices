@@ -1,14 +1,15 @@
-FROM ruby:2.2-alpine
+FROM alpine:3.11.6
 
-ENV APP_HOME /app
-RUN mkdir $APP_HOME
+ARG BUNDLER_VERSION=1.17.2
 
-WORKDIR $APP_HOME
-COPY Gemfile* $APP_HOME/
-RUN apk --no-cache --update add build-base && \
-    bundle install && \
-    apk del build-base
-COPY . $APP_HOME
+RUN apk add --no-cache ruby-full ruby-dev build-base \
+  && gem install bundler:$BUNDLER_VERSION
+
+WORKDIR /app
+
+COPY Gemfile* ./
+RUN bundle install
+COPY . .
 
 ENV POST_SERVICE_HOST post
 ENV POST_SERVICE_PORT 5000
