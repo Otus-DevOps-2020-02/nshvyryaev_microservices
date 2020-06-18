@@ -79,7 +79,7 @@ gcloud compute firewall-rules create reddit-app \
 - Зайти на `http://<docker-host-ip>:9292/`
 - Написать пост
 
-# ДЗ №14 - Docker 4: сети, docker-compose
+## ДЗ №14 - Docker 4: сети, docker-compose
 - Выполнены эксперименты с запуском docker-контейнеров в сети с драйверами none, host, bridge
 
 - Запуск больше одного контейнера nginx с `--network host` невозможен так как порт уже занят, возникает ошибка,
@@ -108,3 +108,30 @@ gcloud compute firewall-rules create reddit-app \
 - Выполнить `docker-machine ls` для получени IP адреса docker-host
 - Зайти на `http://<docker-host-ip>:9292/`
 - Написать пост
+
+## ДЗ №15 - Gitlab 1: построение процесса непрерывной поставки
+- Запущен docker-host в GCE
+- Установлен gitlab
+- Запущен docker runner для проекта
+- Создан Gitlab-проект и настроен для использования CI/CD. Этот репозиторий запушен в него как в дополнительный remote.
+- CI/CD сконфигурирован запускать тесты, ссылаться на динамические окружения с учетом требований к веткам и других ограничений (тэги, ручной запуск).
+
+### Как запустить
+#### Установка gitlab
+- Выполнить [скрипт запуска docker-host в GCE](gitlab-ci/docker-machine/create.sh)
+- Выполнить [скрипт установки Gitlab](gitlab-ci/docker-machine/install_gitlab.sh)
+(выполнять из папки `gitlab-ci/docker-machine/`)
+#### Запуск runner
+- Используя docker-machine (`eval $(docker-machine env gitlab-ci)`)
+- Выполнить
+ ```
+docker run -d --name gitlab-runner --restart always \
+            -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            gitlab/gitlab-runner:latest
+```
+- Для регистрации runner выполнить `docker exec -it gitlab-runner gitlab-runner register --run-untagged --locked=false`
+
+### Как проверить
+- После установки Gitlab на VM можно перейти по http://VM_PUBLIC_IP. (Начальная инициализация Gitlab может занять несколько минут)
+- Добавленные для проекта раннеры видны тут: http://VM_PUBLIC_IP/group/project/-/settings/ci_cd
