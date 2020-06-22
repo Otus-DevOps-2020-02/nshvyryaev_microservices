@@ -23,14 +23,14 @@ docker push nikitagsh/otus-reddit:1.0
 - Запустить локально из запушенного образа - `docker run --name reddit -d -p 9292:9292 --rm nikitagsh/otus-reddit:1.0`
 
 ### (*) Создание окружения с помощью Packer, Terraform, Ansible
-- Добавлена папка [dockermonolith/infra](docker-monolith/infra)
+- Добавлена папка [docker-monolith/infra](docker/docker-monolith/infra)
 - С помощью Packer собран образ `docker-host`, содержащий установленный Docker
 - С помощью Terraform можно запустить конфигурируемое переменной количество инстансов и разрешить трафик на порт 9292
 - Ansible устанавливает необходимые для своей работы с докером плагины и запускает контейнер с приложение на каждом инстансе, полученном с помощью динамического inventory.
-- Инструкции по запуску инфраструктуры можно найти в [infra README](docker-monolith/infra/README.md)
+- Инструкции по запуску инфраструктуры можно найти в [infra README](docker/docker-monolith/infra/README.md)
 
 ### Примечания
-- Для доступа к приложению нужно открыть порт `9292` (использовать скрипт [gcloud_add_firewall_rule_puma.sh](./docker-monolith/gcloud_add_firewall_rule_puma.sh)):
+- Для доступа к приложению нужно открыть порт `9292` (использовать скрипт [gcloud_add_firewall_rule_puma.sh](docker/docker-monolith/gcloud_add_firewall_rule_puma.sh)):
 ```bash
 gcloud compute firewall-rules create reddit-app \
  --allow tcp:9292 \
@@ -90,9 +90,9 @@ gcloud compute firewall-rules create reddit-app \
 
 - Проведены исследования bridge-интерфейсов и сетей на docker-machine.
 
-- Создан файл [docker-compose.yml](src/docker-compose.yml)
+- Создан файл [docker-compose.yml](docker/docker-compose.yml)
   - Добавлен alias `comment_db` для базы, иначе сервис комментариев ее не видит. Можно так же подправить переменную окружения в docker-compose.yml для сервиса comment.
-- Создан файл с переменными [.env](src/.env), [docker-compose.yml](src/docker-compose.yml) параметризован
+- Создан файл с переменными [.env](docker/.env), [docker-compose.yml](docker/docker-compose.yml) параметризован
 - Созданные сущности имеют префикс `src` - название директории, в которой находится docker-compose.yml. Можно переопределить с помощью:
   - [COMPOSE_PROJECT_NAME](https://docs.docker.com/compose/reference/envvars/#compose_project_name)
   - Из командной строки с ключом [-p, --project-name NAME](https://docs.docker.com/compose/reference/overview/)
@@ -135,3 +135,33 @@ docker run -d --name gitlab-runner --restart always \
 ### Как проверить
 - После установки Gitlab на VM можно перейти по http://VM_PUBLIC_IP. (Начальная инициализация Gitlab может занять несколько минут)
 - Добавленные для проекта раннеры видны тут: http://VM_PUBLIC_IP/group/project/-/settings/ci_cd
+
+## ДЗ №16 - Monitoring 1: Введение. Системы мониторинга
+- Запущен docker-host в GCE: [команды тут](monitoring/docker-machine.md)
+- Добалвен Docker образ для [Prometheus](monitoring/prometheus/Dockerfile)
+- Собраны образы сервисов командами `bash docker_build.sh`
+ в каждой из папок `src/ui`, `src/post-py`, `src/comment`
+- Prometheus добавлен в [docker-compose.yml](docker/docker-compose.yml)
+- Использован UI Prometheus для проверки состояния приложения
+- Добавлен node_exporter
+- Собранные образы запушены в [Docker Hub](https://hub.docker.com/u/nikitagsh)
+- Добавлены экспортеры:
+  - (★) Для MongoDB ( [github](https://github.com/percona/mongodb_exporter), [dockerhub](https://hub.docker.com/r/bitnami/mongodb-exporter) )
+  - (★) black-box для контроля работы сервисов ([github](https://github.com/prometheus/blackbox_exporter), [dockerhub](https://hub.docker.com/r/prom/blackbox-exporter/))
+- Добавлен [Makefile](Makefile) для сборки образов и доставки их в Docker Registry
+
+### Как запустить
+- Создать инстанс в GCE: [команды тут](monitoring/docker-machine.md)
+- Создать правила файервола: [script](monitoring/gcloud_add_firewall_rules_prometheus_puma.sh)
+- Собрать все необходимые образы командой `make b_all`
+- Запустить докер-инфраструктуру
+```bash
+cd ./docker
+docker-compose -f docker-compose.yml up -d
+```
+- Запушить в Docker Registry можно командо `make p_all`
+
+### Как проверить
+- Получить IP адрес VM с запущенными сервисами `docker-machine ip docker-host`
+- Приложение должно быть доступно по http://docker-host-ip:9292
+- Prometheus должен быть доступен по http://docker-host-ip:9090
