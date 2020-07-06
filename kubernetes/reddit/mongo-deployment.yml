@@ -1,0 +1,19 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      name: db
+      labels:
+        app: db
+    spec:
+      containers:
+        - image: mongo:3.2
+          name: db
