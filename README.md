@@ -148,7 +148,7 @@ docker run -d --name gitlab-runner --restart always \
 - Добавлены экспортеры:
   - (★) Для MongoDB ( [github](https://github.com/percona/mongodb_exporter), [dockerhub](https://hub.docker.com/r/bitnami/mongodb-exporter) )
   - (★) black-box для контроля работы сервисов ([github](https://github.com/prometheus/blackbox_exporter), [dockerhub](https://hub.docker.com/r/prom/blackbox-exporter/))
-- Добавлен [Makefile](Makefile) для сборки образов и доставки их в Docker Registry
+- (★) Добавлен [Makefile](Makefile) для сборки образов и доставки их в Docker Registry
 
 ### Как запустить
 - Создать инстанс в GCE: [команды тут](monitoring/docker-machine.md)
@@ -165,3 +165,31 @@ docker-compose -f docker-compose.yml up -d
 - Получить IP адрес VM с запущенными сервисами `docker-machine ip docker-host`
 - Приложение должно быть доступно по http://docker-host-ip:9292
 - Prometheus должен быть доступен по http://docker-host-ip:9090
+
+## ДЗ-19 "Введение в Kubernetes"
+
+  - Kubernetes кластер развернут в GCP вручную, следуя туториалу
+    [The Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way)
+
+    Выполненные шаги и заметки собраны [здесь](./kubernetes/the_hard_way/THE_HARD_WAY.md)
+
+  - Проверено, что в созданном K8s-кластере заготовки деплойментов
+    ([*-deployment.yml](./kubernetes/reddit)) применяются и поды создаются
+
+### Как запустить проект:
+
+  - Выполнить инстукции туториала The Hard Way
+
+    _Чтобы учесть огрничение GCP в 4 IP-адресса,
+     вместо 3 контроллеров и 3 воркеров,
+     создаются 2 контролллера и 2 воркера.
+     Команды из инструкции были скорректированы с учетом этого_
+
+### Как проверить работоспособность:
+
+  - Проверка работоспособности K8s-кластера выполняется шагом
+    [Smoke Test](https://github.com/kelseyhightower/kubernetes-the-hard-way/blob/master/docs/13-smoke-test.md)
+
+  - Проверить запуск подов reddit-приложения можно командой
+
+        kubectl get pods
