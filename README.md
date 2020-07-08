@@ -356,3 +356,61 @@ docker-compose -f docker-compose.yml up -d
     - Helm3
 
     Подробнее см. [HELM.md](./kubernetes/HELM.md)
+##### Gitlab
+
+  - В Kubernetes-кластере поднят Gitlab с с помощью opensource Helm-чарта
+
+  - Под каждую из компонент Reddit-приложения, включая деплой,
+    создан отдельный репозиторий со своим CI/CD пайплайном
+
+  - Для feature-веток поднимаются динамические окружения
+
+  - Деплой всего приложения осуществяется на статические окружения: staging, production
+
+## Как запустить проект:
+
+  - Создать k8s кластер в GKE с помощью Terrafrom.
+    (Подробнее см. [KUBERNETES.md](./kubernetes/KUBERNETES.md))
+
+        cd ./kubernetes/terraform
+        terraform init
+        terraform plan
+        terraforn apply
+
+  - С помощью Helm задеплоить релиз
+
+        cd kubernetes/Charts
+        helm install --name <release-name> ./reddit
+
+  - Установить Gitlab
+
+        helm install --name gitlab ./gitlab-omnibus -f values.yaml
+
+  - Для доступа на Gitlab UI добавить в `/etc/hosts` IP адрес gitlab ingress'а
+
+        GITLAB_IP=$(kubectl get service -n nginx-ingress nginx -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
+        echo "$GITLAB_IP gitlab-gitlab staging production" >> /etc/hosts
+
+    Поступить аналогично в случае динамических окружений feature-веток
+
+## Как проверить работоспособность:
+
+  - Проверить текущий K8s контекст
+
+        kubectl config current-context
+
+  - Проверить наличие и состояние ресурсов приложения
+
+        kubectl get all
+
+  - Приложение должно быть доступно по `https://<ingress_ip>` ,
+    где `ingress_ip` можно получить из вывода команды
+
+        kubectl get ingress ui -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+  - Gitlab UI должен быть доступен по `http://<gitlab_ingress_ip`
+
+        kubectl get service -n nginx-ingress nginx -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+
+  - Запушить изменения в репозиторий, соответсвующий компоненте: ui, comment, post, reddit.
+    Динамические и статические окружения должны быть доступны по `http://<staging|production|branch>`
