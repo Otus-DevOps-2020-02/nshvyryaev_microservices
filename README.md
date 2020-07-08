@@ -283,7 +283,7 @@ docker-compose -f docker-compose.yml up -d
      - Ingress
      - _Не удалось запустить Ingress одновременно с LoadBalancer - заработало только вместе с NodePort_
      - Ingress с TLS терминацией
-     - (⭐) Созданный tls-сертификат загружается в кластер с помощью [ui-tls-secret.yml](./kubernetes/reddit/ui-tls-secret.yml)
+     - (⭐) Созданный tls-сертификат загружается в кластер с помощью [ui-tls-secret.yml](kubernetes/Charts/ui/tempates/tls-secret.yaml)
 
   - Сетевой доступ к MongoDB ограничен **post** и **comment** сервисами с помощью NetworkPolicy.
     Для этого для кластера включается GKE-плагин network policy **CALICO** с помощью [Terraform](./kubernetes/terraform/main.tf)
@@ -338,3 +338,21 @@ docker-compose -f docker-compose.yml up -d
     где `ingress_ip` можно получить из вывода команды
 
         kubectl get ingress ui -n dev -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+# ДЗ-22 "CI/CD в Kubernetes"
+
+## В процессе сделано:
+
+##### Helm
+
+  - Развертывание kubernetes-компонентов для ui, comment, post щаблонизировано с помощью Helm.
+    См [kubernetes/Charts](./kubernetes/Charts).
+    Для деплоя создан общий чарт [reddit](./kubernetes/Charts/reddit), зависящий от ui, comment, post
+
+  - Установка Helm-релиза reddit-приложения осуществлена с помощью
+
+    - Helm2 + Tiller (server side)
+    - Helm2 + Tiller plugin
+    - Helm3
+
+    Подробнее см. [HELM.md](./kubernetes/HELM.md)
