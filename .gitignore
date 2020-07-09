@@ -14,3 +14,5 @@ variables.json
 # Ansible
 *.retry
 service-account-file.json
+
+gitlab_ci
