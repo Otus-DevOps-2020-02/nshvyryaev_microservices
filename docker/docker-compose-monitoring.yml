@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   prometheus:
-    image: ${USERNAME}/prometheus
+    image: ${USER_NAME}/prometheus
     ports:
       - '9090:9090'
     volumes:
@@ -33,7 +33,7 @@ services:
     networks:
       - backend
   blackbox_exporter:
-    image: ${USERNAME}/blackbox-exporter:${VERSION_BLACKBOX_EXPORTER:-latest}
+    image: ${USER_NAME}/blackbox-exporter:${VERSION_BLACKBOX_EXPORTER:-latest}
     ports:
       - '9115:9115'
     networks:

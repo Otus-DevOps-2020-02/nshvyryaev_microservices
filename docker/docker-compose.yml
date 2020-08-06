@@ -9,18 +9,18 @@ services:
         aliases:
           - comment_db
   ui:
-    image: ${USERNAME}/ui:${UI_VERSION}
+    image: ${USER_NAME}/ui:${UI_VERSION}
     ports:
       - ${UI_PORT}:9292/tcp
     networks:
       - frontend
   post:
-    image: ${USERNAME}/post:${POST_VERSION}
+    image: ${USER_NAME}/post:${POST_VERSION}
     networks:
       - backend
       - frontend
   comment:
-    image: ${USERNAME}/comment:${COMMENT_VERSION}
+    image: ${USER_NAME}/comment:${COMMENT_VERSION}
     networks:
       - backend
       - frontend
