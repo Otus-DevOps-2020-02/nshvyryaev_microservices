@@ -238,6 +238,57 @@ docker-compose -f docker-compose.yml up -d
   - Метрики отдельных экспортеров доступны на их портах,
     если были добавлены соответствующие правила файервола.
 
+# ДЗ-18 "Логирование и распреде распределенная трассировка"
+
+## В процессе сделано:
+
+  - Собраны образы сервисов приложения под тэгом `logging`
+
+  - Создан отдельный [docker-compose-logging.yml](./docker/docker-compose-logging.yml),
+    который запускает сервисы [Fluentd](./logging/fluentd), ElasticSearch, Kibana, Zipkin
+
+    _ElasticSearch запускается в development & testing режиме с помощью env `discovery.type=single-node`_
+
+  - Севрис post настроен отправлять логи во Fluentd, которые парсятся json-фильтром.
+    Сервис ui настроен отправлять неструктурированные логи во Fluentd,
+    которые парсятся regex-ами или grok-фильтрами в нужный формат.
+
+  - В Kibana создан индекс-паттерн для наблюдения за логами.
+
+  - В Zipkin произведен трэйсинг запросов на ui сервис
+
+## Как запустить проект:
+
+  - Создать GCP-инстанс [(ссылка на gist)](https://raw.githubusercontent.com/express42/otus-snippets/master/hw-25/create_docker-machine)
+
+  - Создать правила файервола: разрешить порты tcp:5601,9292,9411
+
+  - Переключиться на докер-окружение
+
+        eval $(docker-machine env logging)
+        export USER_NAME=nikitagsh
+
+  - Запустить докер-инфраструктуру логгинга и приложения
+
+        cd ./docker
+        docker-compose -f docker-compose-logging.yml up -d
+        docker-compose -f docker-compose.yml up -d
+
+## Как проверить работоспособность:
+
+  - Получить IP адрес VM с запущенными сервисами
+
+        docker-machine ip docker-host
+
+  - Приложение должно быть доступно по http://docker-host-ip:9292
+
+  - Kibana должна быть доступен по http://docker-host-ip:5601
+
+  - Zipkin должен быть доступен по http://docker-host-ip:9411
+
+  - Метрики отдельных экспортеров доступны на их портах,
+    если были добавлены соответствующие правила файервола.
+
 ## ДЗ-19 "Введение в Kubernetes"
 
   - Kubernetes кластер развернут в GCP вручную, следуя туториалу
