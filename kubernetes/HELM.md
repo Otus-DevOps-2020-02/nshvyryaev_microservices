@@ -47,6 +47,11 @@ Install the plugin
 
 #### Charts
 
+Add Helm repository
+
+     helm repo add nginx-stable https://helm.nginx.com/stable
+     helm repo update
+
 Install ui chart
 
      helm install --name test-ui-1 ui/
