@@ -10,17 +10,33 @@ services:
           - comment_db
   ui:
     image: ${USER_NAME}/ui:${UI_VERSION}
+    environment:
+      - ZIPKIN_ENABLED
     ports:
       - ${UI_PORT}:9292/tcp
     networks:
       - frontend
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.ui
   post:
     image: ${USER_NAME}/post:${POST_VERSION}
+    environment:
+      - ZIPKIN_ENABLED
     networks:
       - backend
       - frontend
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.post
   comment:
     image: ${USER_NAME}/comment:${COMMENT_VERSION}
+    environment:
+      - ZIPKIN_ENABLED
     networks:
       - backend
       - frontend
