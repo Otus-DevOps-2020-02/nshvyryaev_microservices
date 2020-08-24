@@ -166,6 +166,78 @@ docker-compose -f docker-compose.yml up -d
 - Приложение должно быть доступно по http://docker-host-ip:9292
 - Prometheus должен быть доступен по http://docker-host-ip:9090
 
+---
+
+# ДЗ-17 "Мониторинг приложения и инфраструктуры"
+
+## В процессе сделано:
+
+  - Рефакторинг docker-compose файла,
+    разбит на [docker-compose.yml](./docker/docker-compose.yml) и [docker-compose-monitoring.yml](./docker/docker-compose-monitoring.yml)
+
+  - Добавлены источники метрик для Prometheus:
+
+    - cAdvisor для докер-метрик
+
+    - сервиса [post](./src/post-py)
+
+  - В составе мониторинг-кластера поднята [Grafanа](./monitoring/grafana).
+
+  - Настроены дашборды в Grafana:
+
+    - Импортирован дашборд для Докера
+
+    - Дашборд для мониторинга состояния приложения
+
+    - Дашборд для мониторинга бизнес-метрик
+
+  - С помощью [Alertmanager](./monitoring/alertmanager) настроен алёрт в
+    Slack-канал #nikita_shvyryaev
+    о недоступности любого из компонентов приложения
+
+## Как запустить проект:
+
+  - Созадть GCP-инстанс
+
+        export GOOGLE_PROJECT=_your_project_
+        docker-machine create --driver google \
+            --google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+            --google-machine-type n1-standard-1 \
+            --google-zone europe-west1-b \
+            docker-host
+
+  - Создать правила файервола для открытия наружу портов tcp 8080, 8000, 3000
+
+  - Переключиться на докер-окружение (см. подробнее в [здесь](./monitoring/maintain_monitoring.sh))
+
+        eval $(docker-machine env docker-host)
+        export USER_NAME=nikitagsh
+
+  - Запустить докер-инфраструктуру приложения и мониторинга
+
+        cd ./docker
+        docker-compose -f docker-compose.yml up -d
+        docker-compose -f docker-compose-monitoring.yml up -d
+
+  - В Grafan'e создать источник данных Prometheus и импортировать дашборды
+
+## Как проверить работоспособность:
+
+  - Получить IP адрес VM с запущенными сервисами
+
+        docker-machine ip docker-host
+
+  - Приложение должно быть доступно по http://docker-host-ip:9292
+
+  - Prometheus должен быть доступен по http://docker-host-ip:9000
+
+  - cAdviser  должен быть доступен по http://docker-host-ip:8080
+
+  - Grafana должы быть доступна по http://docker-host-ip:3000
+
+  - Метрики отдельных экспортеров доступны на их портах,
+    если были добавлены соответствующие правила файервола.
+
 ## ДЗ-19 "Введение в Kubernetes"
 
   - Kubernetes кластер развернут в GCP вручную, следуя туториалу
