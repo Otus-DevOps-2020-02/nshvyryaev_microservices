@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------- terraform / backend
 terraform {
-  required_version = "~>0.12.0"
+  required_version = "~>0.13.0"
 }
 //---------------------------------------------------------------------- provider
 provider "google" {
@@ -24,6 +24,7 @@ resource "google_container_cluster" "kubernetes-cluster" {
   location           = var.zone != "" ? var.zone : var.region
   network            = "default"
   initial_node_count = var.node_count
+  enable_legacy_abac = true
 
   master_auth {
     //// Basic authentication is disabled
